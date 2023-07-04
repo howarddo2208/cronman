@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
+	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/spf13/viper"
 )
 
@@ -58,9 +61,30 @@ func readConfigFile(configFilePath string) (map[string]Job, error) {
 }
 
 func runCronJobs(jobs map[string]Job) {
-	// for every job in jobs, create a cron job which run the command based on the schedule. Each cron job should run in separated goroutine
+	// Create a scheduler instance
+	s := gocron.NewScheduler(time.Local)
+
+	// Iterate over the jobs and schedule them
 	for name, job := range jobs {
-		fmt.Printf("Job: %v, %v\n", name, job)
+		scheduleJob(s, name, job)
+	}
+
+	// Start the scheduler
+	s.StartBlocking()
+}
+
+func scheduleJob(s *gocron.Scheduler, name string, job Job) {
+	_, err := s.CronWithSeconds(job.Schedule).Do(func() {
+		cmd := exec.Command("sh", "-c", job.Cmd)
+		out, err := cmd.Output()
+		if err != nil {
+			fmt.Printf("Error running command: %s\n", err)
+			return
+		}
+		fmt.Println(string(out))
+	})
+	if err != nil {
+		fmt.Printf("Failed to schedule job %s: %s\n", name, err)
 	}
 }
 

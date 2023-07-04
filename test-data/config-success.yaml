@@ -1,7 +1,7 @@
 jobs: 
   test1:
-    cmd: cd ~/Downloads && pwd
+    cmd: pwd
     schedule: "*/2 * * * * *"
   test2:
-    cmd: cd ~/Sync/howard-pkm && pwd
-    schedule: "*/3 * * * * *"
+    cmd: echo 'haha'
+    schedule: "*/4 * * * * *"

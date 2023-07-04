@@ -8,14 +8,20 @@ I'm writing this as my first project in my journey learning golang. I'm trying t
     
     - [x] parse config file as map of Job
 
-        - [] create default yaml file when first run
+        - [] create default yaml with instructions file when first run
         
         - [] handle error for invalid format, empty config
     
-    - [] test execute
+    - [] test execute with CLI arguments
 
-    - [] run daemon mode?
+    - [] add more unit test for executing job
+
+    - [] run in daemon?
+
+    - [] Logging solution
 
     - [] complete MVP
+
+    - [] refactor into packages
 
     - [] Terminal User interface (bubbletea?)
