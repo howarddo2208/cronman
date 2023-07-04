@@ -6,10 +6,16 @@ I'm writing this as my first project in my journey learning golang. I'm trying t
 
     - [x] create config file (with viper)
     
-    - [] parse config file as array of scheduler
+    - [x] parse config file as map of Job
+
+        - [] create default yaml file when first run
+        
+        - [] handle error for invalid format, empty config
     
     - [] test execute
 
+    - [] run daemon mode?
+
     - [] complete MVP
 
-    - [] Terminal User interface
+    - [] Terminal User interface (bubbletea?)

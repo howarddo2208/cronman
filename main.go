@@ -3,61 +3,73 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
+	"path"
+	"path/filepath"
 
-	"github.com/go-co-op/gocron"
 	"github.com/spf13/viper"
 )
 
-func hello(name string) {
-	message := fmt.Sprintf("Hello, %s!", name)
-	fmt.Println(message)
+type Job struct {
+	Cmd      string
+	Schedule string
 }
 
-func runCronJobs() {
-	s := gocron.NewScheduler(time.Local)
-
-	s.Every(4).Second().Do(func() {
-		hello("Le Van Dat")
-	})
-
-	s.StartBlocking()
+type Config struct {
+	Jobs map[string]Job
 }
 
-var (
-	configDir  = os.Getenv("HOME") + "/.config/cronman"
-	configFile = configDir + "/cronman.yaml"
-)
-
-func createConfigFile() (*os.File, error) {
+func createConfigFile(configFilePath string) (*os.File, error) {
+	configDir := path.Dir(configFilePath)
 	if err := os.MkdirAll(configDir, 0770); err != nil {
 		return nil, err
 	}
-	return os.Create(configFile)
+	return os.Create(configFilePath)
 }
 
-func main() {
+func readConfigFile(configFilePath string) (map[string]Job, error) {
 	// load config file
-	viper.SetConfigName("cronman") // name of config file (without extension)
-	viper.SetConfigType(
-		"yaml",
-	) // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath(configDir) // call multiple times to add many search paths
-	err := viper.ReadInConfig()    // Find and read the config file
-	if err != nil {                // Handle errors reading the config file
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; create new file at the path
+	configDir := path.Dir(configFilePath)
+	fullName := path.Base(configFilePath)
+	nameWithoutExt := fullName[0 : len(fullName)-len(filepath.Ext(fullName))]
+	viper.SetConfigName(nameWithoutExt)
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(configDir)
+	errReading := viper.ReadInConfig()
+	if errReading != nil { // Handle errors reading the config file
+		if _, ok := errReading.(viper.ConfigFileNotFoundError); ok {
 			fmt.Println("Config file not found; create new file at the path")
-			_, err2 := createConfigFile()
-			if err2 != nil {
-				panic(fmt.Errorf("fatal error config file: %w", err2))
+			_, errCreating := createConfigFile(configDir)
+			if errCreating != nil {
+				return nil, errCreating
 			}
 		} else {
-			panic(fmt.Errorf("fatal error config file: %w", err))
+			return nil, errReading
 		}
 	}
 
-	// TODO: parse config file
+	var config Config
 
-	// runCronJobs()
+	errParsing := viper.Unmarshal(&config)
+	if errParsing != nil {
+		return nil, errParsing
+	}
+
+	return config.Jobs, nil
+}
+
+func runCronJobs(jobs map[string]Job) {
+	// for every job in jobs, create a cron job which run the command based on the schedule. Each cron job should run in separated goroutine
+	for name, job := range jobs {
+		fmt.Printf("Job: %v, %v\n", name, job)
+	}
+}
+
+func main() {
+	configFilePath := os.Getenv("HOME") + "/.config/cronman/cronman.yaml"
+	jobs, err := readConfigFile(configFilePath)
+	if err != nil {
+		panic(err)
+	}
+
+	runCronJobs(jobs)
 }

@@ -1,0 +1,7 @@
+jobs: 
+  test1:
+    cmd: cd ~/Downloads && pwd
+    schedule: "*/2 * * * * *"
+  test2:
+    cmd: cd ~/Sync/howard-pkm && pwd
+    schedule: "*/3 * * * * *"
