@@ -5,20 +5,20 @@ I'm writing this as my first project in my journey learning golang. I'm trying t
 ## TODOS
 
     - [x] create config file (with viper)
-    
+
     - [x] parse config file as map of Job
 
         - [] create default yaml with instructions file when first run
-        
+
         - [] handle error for invalid format, empty config
 
     - [] support `cmdFile` for defining jobs
-    
+
     - [] test execute with CLI arguments
 
     - [] add more unit test for executing job
 
-    - [] run in daemon?
+    - [x] run in daemon? (reference: https://ieftimov.com/posts/four-steps-daemonize-your-golang-programs). Revert back, seems like I can run as daemon with launchd or supervisor
 
     - [] Logging solution
 
