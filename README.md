@@ -11,6 +11,8 @@ I'm writing this as my first project in my journey learning golang. I'm trying t
         - [] create default yaml with instructions file when first run
         
         - [] handle error for invalid format, empty config
+
+    - [] support `cmdFile` for defining jobs
     
     - [] test execute with CLI arguments
 
